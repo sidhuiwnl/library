@@ -13,11 +13,11 @@ import { format } from "date-fns";
 import axios from "axios";
 import { backendUrl } from "../config";
 import { Book } from "../types";
-import AddBookModal from "../components/BookModal"; 
+import AddBookModal from "../components/BookModal";
 
 export default function AdminDashboard() {
   const [books, setBooks] = useState<Book[]>([]);
-  const [isModalOpen, setModalOpen] = useState(false); 
+  const [isModalOpen, setModalOpen] = useState(false);
 
   async function init() {
     try {
@@ -74,7 +74,6 @@ export default function AdminDashboard() {
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-8">Admin Dashboard</h1>
 
-      
       <button
         className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
         onClick={() => setModalOpen(true)}
@@ -82,11 +81,7 @@ export default function AdminDashboard() {
         Add a Book
       </button>
 
-      
-      <AddBookModal
-        isOpen={isModalOpen}
-        onClose={() => setModalOpen(false)}
-      />
+      <AddBookModal isOpen={isModalOpen} onClose={() => setModalOpen(false)} />
 
       <section className="mb-8">
         <h2 className="text-2xl font-semibold mb-4">Books by Category</h2>
