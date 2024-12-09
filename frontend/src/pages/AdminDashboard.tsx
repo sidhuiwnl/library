@@ -13,9 +13,11 @@ import { format } from "date-fns";
 import axios from "axios";
 import { backendUrl } from "../config";
 import { Book } from "../types";
+import AddBookModal from "../components/BookModal"; 
 
 export default function AdminDashboard() {
   const [books, setBooks] = useState<Book[]>([]);
+  const [isModalOpen, setModalOpen] = useState(false); 
 
   async function init() {
     try {
@@ -28,7 +30,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     init();
-  }, [books]);
+  }, []);
 
   const booksByCategory = books.reduce((acc, book) => {
     acc[book.category] = (acc[book.category] || 0) + 1;
@@ -36,21 +38,19 @@ export default function AdminDashboard() {
   }, {} as Record<string, number>);
 
   const overdueBooks = books.filter((book) => {
-
-    if(book.status === "sold"){
+    if (book.status === "sold") {
       const issuedDate = book.issuedDate ? new Date(book.issuedDate) : null;
       const dueDate = book.dueDate
         ? new Date(book.dueDate)
         : issuedDate
         ? new Date(issuedDate.getTime() + 15 * 24 * 60 * 60 * 1000)
         : null;
-  
+
       return dueDate && dueDate < new Date();
-    }else{
-      return
+    } else {
+      return false;
     }
   });
-
 
   const soldBooks = books.filter(
     (book) => book.status === "sold" && book.issuedDate
@@ -73,6 +73,20 @@ export default function AdminDashboard() {
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-8">Admin Dashboard</h1>
+
+      
+      <button
+        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+        onClick={() => setModalOpen(true)}
+      >
+        Add a Book
+      </button>
+
+      
+      <AddBookModal
+        isOpen={isModalOpen}
+        onClose={() => setModalOpen(false)}
+      />
 
       <section className="mb-8">
         <h2 className="text-2xl font-semibold mb-4">Books by Category</h2>

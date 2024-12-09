@@ -14,85 +14,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const dbConnect_1 = require("./lib/dbConnect");
-const user_1 = __importDefault(require("./modals/user"));
-const admin_1 = __importDefault(require("./modals/admin"));
 const book_1 = require("./modals/book");
 const cors_1 = __importDefault(require("cors"));
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
-app.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    yield (0, dbConnect_1.dbConnect)();
-    const { email, password, role } = req.body;
-    try {
-        if (!email || !password || !role) {
-            res.status(400).json({
-                success: false,
-                message: "Email, password, and role are required",
-            });
-        }
-        const existingUser = yield user_1.default.findOne({
-            email: email,
-        });
-        if (existingUser) {
-            res.status(401).json({
-                message: "User aldready existed please sign-in",
-            });
-        }
-        if (role === "USER") {
-            const response = yield user_1.default.create({
-                email: email,
-                password: password,
-                role: role,
-            });
-            if (response) {
-                res.json({
-                    message: "User created successfully",
-                    response,
-                });
-            }
-        }
-    }
-    catch (error) {
-        console.error("Error registering user", error);
-        res.status(500).json({
-            success: false,
-            message: "Error registering user",
-        });
-    }
-}));
-app.post("/admin", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    yield (0, dbConnect_1.dbConnect)();
-    const { email, password, role } = req.body;
-    try {
-        if (!email || !password || !role) {
-            res.status(400).json({
-                success: false,
-                message: "Email, password, and role are required",
-            });
-        }
-        const existingAdmin = yield admin_1.default.findOne({
-            email: email,
-            role: role,
-        });
-        if (!existingAdmin) {
-            res.status(404).json({
-                message: "The credientals are incorrect for admin access",
-            });
-        }
-        res.status(200).json({
-            sucess: true,
-            message: "Admin access granted",
-        });
-    }
-    catch (error) {
-        console.error("Error registering user", error);
-        res.status(500).json({
-            success: false,
-            message: "Error registering user",
-        });
-    }
-}));
 app.get("/getBooks", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, dbConnect_1.dbConnect)();
     try {
@@ -154,7 +80,7 @@ app.put("/updateBook", (req, res) => __awaiter(void 0, void 0, void 0, function*
         const updateBook = yield book_1.Book.findByIdAndUpdate(bookId, {
             status: status,
             title: title,
-            category: category
+            category: category,
         }, {
             new: true,
             runValidators: true,
@@ -168,7 +94,7 @@ app.put("/updateBook", (req, res) => __awaiter(void 0, void 0, void 0, function*
         }
         res.status(200).json({
             success: true,
-            data: Object.assign({}, updateBook._doc)
+            data: Object.assign({}, updateBook._doc),
         });
     }
     catch (error) {
@@ -176,6 +102,33 @@ app.put("/updateBook", (req, res) => __awaiter(void 0, void 0, void 0, function*
         res.status(500).json({
             success: false,
             message: "Error updating book",
+        });
+    }
+}));
+app.post("/addBooks", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    yield (0, dbConnect_1.dbConnect)();
+    const { title, category, issuedDate, status } = req.body;
+    const issuedDateObj = new Date(issuedDate);
+    const dueDateObj = new Date(issuedDateObj);
+    dueDateObj.setDate(issuedDateObj.getDate() + 15);
+    try {
+        const response = yield book_1.Book.create({
+            title: title,
+            category: category,
+            issuedDate: issuedDateObj,
+            dueDate: dueDateObj,
+            status: status
+        });
+        res.status(200).json({
+            success: true,
+            data: response
+        });
+    }
+    catch (error) {
+        console.error("Error updating book:", error);
+        res.status(500).json({
+            success: false,
+            message: "Error Server",
         });
     }
 }));

@@ -120,6 +120,40 @@ app.put("/updateBook", async (req, res) => {
   }
 });
 
+
+
+app.post("/addBooks",async(req,res) =>{
+  await dbConnect()
+  const { title,category,issuedDate,status } = req.body;
+
+  const issuedDateObj = new Date(issuedDate);
+  const dueDateObj = new Date(issuedDateObj);
+  dueDateObj.setDate(issuedDateObj.getDate() + 15);
+
+  try {
+      const response = await Book.create({
+        title : title,
+        category : category,
+        issuedDate : issuedDateObj,
+        dueDate : dueDateObj,
+        status : status
+      })
+
+      res.status(200).json({
+        success : true,
+        data : response
+      })
+
+  } catch (error) {
+    console.error("Error updating book:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Error Server",
+    });
+  }
+})
+
 app.listen(3000, () => {
   console.log("Server running on port 3000");
 });

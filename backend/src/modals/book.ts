@@ -11,11 +11,6 @@ const BookSchema = new Schema({
     required: [true, "Category is required"],
   },
 
-  author : {
-    type: String,
-    required: [true, "Book author is required"],
-  },
-
   issuedDate: {
     type: Date,
     default: "null",
@@ -25,12 +20,6 @@ const BookSchema = new Schema({
     type : String,
     enum : ["available","borrowed","sold"],
     default : "available"
-  },
-
-  issuedTo: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    default: "null",
   },
 
   dueDate: {
